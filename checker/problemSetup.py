@@ -141,10 +141,15 @@ def main():
     config["py"]["problem_num"] = problem_number
     config["cpp"]["test_case"] = PROBLEM_CODE
 
+    if os.path.exists(problem_dir):
+        print("Problem Already Exist!! Exiting...")
+        return
+
     # Create Problem Dir
-    os.makedirs(problem_dir, exist_ok=True)
+    os.makedirs(problem_dir)
 
     # === 3. SETUP PROBLEM ===
+    # setup .cpp
     if file_link:
         download_zip_files(file_link, problem_dir, problem_path, problem_name)
     elif isProblem:
@@ -153,8 +158,10 @@ def main():
         print("Problem not found...")
         return
     
+    # download problem statement.pdf
     download_problem_statement(pdf_link, problem_dir, problem_name)
     
+    # saves config changes
     with open(CONFIG_DIR, "w") as fout:
         json.dump(config, fout, indent=2)
     print("New config for this problem have been saved!")
@@ -218,7 +225,7 @@ def download_zip_files(file_link, problem_dir, problem_path, problem_name):
 
 def set_up_problem(problem_dir, problem_path, problem_name):
     open(f"{problem_dir}/{problem_name}.cpp", "w").close()
-    config["cpp"]["path"] = problem_path + ".cpp"
+    config["cpp"]["path"] = f"{problem_path}/{problem_name}.cpp"
 
 
 def download_problem_statement(pdf_link, problem_dir, problem_name):
