@@ -58,85 +58,111 @@ chrome_options.add_experimental_option("prefs", {
 
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
-# === 1. LOGIN ===
-print("Waiting for login page...")
-driver.get(LOGIN_URL)
-print("logging in...")
-time.sleep(2)
-driver.find_element(By.ID, "login").send_keys(NAME)
-driver.find_element(By.ID, "password").send_keys(PASSWORD)
-driver.find_element(By.NAME, "commit").click()
-print("logged in!")
-time.sleep(3)
+def main():
+    # === 1. LOGIN ===
+    print("Waiting for login page...")
+    driver.get(LOGIN_URL)
+    print("logging in...")
+    time.sleep(2)
+    driver.find_element(By.ID, "login").send_keys(NAME)
+    driver.find_element(By.ID, "password").send_keys(PASSWORD)
+    driver.find_element(By.NAME, "commit").click()
+    print("logged in!")
+    time.sleep(3)
 
 
-# === 2. GET THE PROBLEM FILES ===
-print(f"Extracting problem: {PROBLEM_CODE}")
-problem_cells = driver.find_elements(
-    By.CSS_SELECTOR,
-    'tbody[data-controller="problem-name"] tr td:nth-of-type(2)'
-)
-
-problem_name = None
-problem_number = None
-file_link = None
-isProblem = False
-for td in problem_cells:
-    # strong = td.find_element(By.TAG_NAME, "strong")
-    # problem_name = problem_name = strong.parent.execute_script(
-    #     "return arguments[0].childNodes[0].textContent.trim();", strong
-    # ).strip().lower().replace(" ", "")
-
-    problem_div = td.find_element(
+    # === 2. GET THE PROBLEM FILES ===
+    print(f"Extracting problem: {PROBLEM_CODE}")
+    problem_cells = driver.find_elements(
         By.CSS_SELECTOR,
-        "div.text-muted.font-monospace"
+        'tbody[data-controller="problem-name"] tr td:nth-of-type(2)'
     )
-    problem_case = problem_div.text.strip().lower().replace(" ", "")
 
-    if problem_case == PROBLEM_CODE.lower().strip().replace(" ", ""):
-        print("Problem found!")
-        isProblem = True
-        # extract testcase name
-        strong = td.find_element(By.TAG_NAME, "strong")
-        problem_name = strong.parent.execute_script(
-            "return arguments[0].childNodes[0].textContent.trim();",
-            strong
-        ).strip().replace(" ", "")
-        
-        # extract problem num
-        read_link = td.find_element(
+    problem_name = None
+    problem_number = None
+    file_link = None
+    isProblem = False
+    for td in problem_cells:
+        problem_div = td.find_element(
             By.CSS_SELECTOR,
-            'a[href*="download/statement"]'
-        ).get_attribute("href")
-        problem_number = int(read_link.split("/")[4])
-
-        # Try to get file link
-        file_elems = td.find_elements(
-            By.CSS_SELECTOR,
-            'a[href*="download/attachment"]'
+            "div.text-muted.font-monospace"
         )
+        problem_case = problem_div.text.strip().lower().replace(" ", "")
 
-        file_link = file_elems[0].get_attribute("href") if file_elems else None
+        if problem_case == PROBLEM_CODE.lower().strip().replace(" ", ""):
+            print("Problem found!")
+            isProblem = True
+            
+            # extract testcase name
+            strong = td.find_element(By.TAG_NAME, "strong")
+            problem_name = strong.parent.execute_script(
+                "return arguments[0].childNodes[0].textContent.trim();",
+                strong
+            ).strip().replace(" ", "")
+            
+            # extract problem statement
+            pdf_link = td.find_element(
+                By.CSS_SELECTOR,
+                'a[href*="download/statement"]'
+            ).get_attribute("href")
 
-        PROBLEM_PATH = f"../{PROBLEM_CAT}/{problem_name}"
-        PROBLEM_DIR = os.path.join(ROOT_DIR, PROBLEM_PATH)
-        break
+            # extract problem num
+            problem_number = int(pdf_link.split("/")[4])
 
-if problem_name:
-    print(f"Testcase name: {problem_name}")
-else:
-    print("Testcase not found...")
+            # Try to get file link
+            file_elems = td.find_elements(
+                By.CSS_SELECTOR,
+                'a[href*="download/attachment"]'
+            )
 
-if problem_number:
-    print(f"Problem Num: {problem_number}")
-else:
-    print("Problem num not found")
+            file_link = file_elems[0].get_attribute("href") if file_elems else None
 
-config["py"]["problem_num"] = problem_number
-config["cpp"]["test_case"] = PROBLEM_CODE
+            problem_path = f"../{PROBLEM_CAT}/{problem_name}"
+            problem_dir = os.path.join(ROOT_DIR, problem_path)
+            break
 
-if file_link:
-# === 3. DOWNLOAD AND EXTRACT THE FILES ===
+    if problem_name:
+        print(f"Probelm name: {problem_name}")
+    else:
+        print("Problem not found")
+        return
+    
+    if file_link:
+        print(f"Testcase name: {PROBLEM_CODE}")
+    else:
+        print("Testcase not found...")
+
+    if problem_number:
+        print(f"Problem Num: {problem_number}")
+    else:
+        print("Problem num not found")
+
+
+    config["py"]["problem_num"] = problem_number
+    config["cpp"]["test_case"] = PROBLEM_CODE
+
+    # Create Problem Dir
+    os.makedirs(problem_dir, exist_ok=True)
+
+    # === 3. SETUP PROBLEM ===
+    if file_link:
+        download_zip_files(file_link, problem_dir, problem_path, problem_name)
+    elif isProblem:
+        set_up_problem(problem_dir, problem_path, problem_name)
+    else:
+        print("Problem not found...")
+        return
+    
+    download_problem_statement(pdf_link, problem_dir, problem_name)
+    
+    with open(CONFIG_DIR, "w") as fout:
+        json.dump(config, fout, indent=2)
+    print("New config for this problem have been saved!")
+
+    print("Problem setup done!")
+
+
+def download_zip_files(file_link, problem_dir, problem_path, problem_name):
     session = requests.Session()
     for cookie in driver.get_cookies():
         session.cookies.set(cookie['name'], cookie['value'])
@@ -151,7 +177,6 @@ if file_link:
 
     if is_zip:
         print("Extracting the zip file...")
-        os.makedirs(PROBLEM_DIR, exist_ok=True)
         try:
             with zipfile.ZipFile(ZIP_PATH, 'r') as z:
                 for file in z.namelist():
@@ -162,27 +187,27 @@ if file_link:
                         extracted_path = z.extract(file, "temp_extract")
 
                         base_name = os.path.basename(file)
-                        dest_path = os.path.join(PROBLEM_DIR, base_name)
+                        dest_path = os.path.join(problem_dir, base_name)
                         
                         print(f"Moving {file_type} file to {dest_path}...")
                         shutil.move(extracted_path, dest_path)
 
-            config["cpp"]["path"] = PROBLEM_PATH + "/main.cpp"
+            config["cpp"]["path"] = f"{problem_path}/main.cpp"
         except Exception as e:
             print(f"Error extracting zip: {e}")
 
     else:
         print("File is not a zip — treating it as a .cpp file.")
         # New file path = parent/probdir.cpp   (no folder created)
-        new_cpp_path = PROBLEM_DIR + ".cpp"
+        new_cpp_path = problem_dir + ".cpp"
 
         print(f"Renaming {ZIP_PATH} → {new_cpp_path}")
         shutil.move(ZIP_PATH, new_cpp_path)
 
         # Update config and STOP (do not delete the file)
-        config["cpp"]["path"] = PROBLEM_PATH + ".cpp"
+        config["cpp"]["path"] = f"{problem_path}/{problem_name}.cpp"
 
-    # CLEANUP ZIP FILE
+    # CLEANUP .zip file
     if os.path.exists(ZIP_PATH):
         os.remove(ZIP_PATH)
 
@@ -191,22 +216,29 @@ if file_link:
         shutil.rmtree("temp_extract")
 
 
+def set_up_problem(problem_dir, problem_path, problem_name):
+    open(f"{problem_dir}/{problem_name}.cpp", "w").close()
+    config["cpp"]["path"] = problem_path + ".cpp"
 
-    with open(CONFIG_DIR, "w") as fout:
-        json.dump(config, fout, indent=2)
-    print("New config for this problem have been saved!")
 
-    print("Problem setup done!")
-
-elif isProblem:
-    open(f"{PROBLEM_DIR}.cpp", "w").close()
-    config["cpp"]["path"] = PROBLEM_PATH + ".cpp"
-
-    with open(CONFIG_DIR, "w") as fout:
-        json.dump(config, fout, indent=2)
-    print("New config for this problem have been saved!")
-
-    print("Problem setup done!")
+def download_problem_statement(pdf_link, problem_dir, problem_name):
+    problem_path = f"{problem_dir}/{problem_name}.pdf"
+    session = requests.Session()
+    for cookie in driver.get_cookies():
+        session.cookies.set(cookie['name'], cookie['value'])
     
-else:
-    print("Problem not found...")
+    print("Downloading Problem Statement...")
+
+    r = session.get(pdf_link, stream=True)
+    r.raise_for_status()
+
+    with open(problem_path, "wb") as f:
+        for chunk in r.iter_content(chunk_size=8192):
+            if chunk:
+                f.write(chunk)
+            
+    print("Problem Statement Downloaded!")
+
+
+if __name__ == "__main__":
+    main()
