@@ -35,6 +35,8 @@ DOWNLOAD_TEMP_DIR = os.path.join(ROOT_DIR, "temp")
 ZIP_PATH = os.path.join(DOWNLOAD_TEMP_DIR, "problem.zip")
 os.makedirs(DOWNLOAD_TEMP_DIR, exist_ok=True)
 
+TEMPLATE_DIR = os.path.join(ROOT_DIR, "template.cpp")
+
 load_dotenv()
 NAME = os.getenv("NAME")
 PASSWORD = os.getenv("PASSWORD")
@@ -127,10 +129,8 @@ def main():
         print("Problem not found")
         return
     
-    if file_link:
-        print(f"Testcase name: {PROBLEM_CODE}")
-    else:
-        print("Testcase not found...")
+    if not file_link:
+        print("Package not found...")
 
     if problem_number:
         print(f"Problem Num: {problem_number}")
@@ -224,7 +224,7 @@ def download_zip_files(file_link, problem_dir, problem_path, problem_name):
 
 
 def set_up_problem(problem_dir, problem_path, problem_name):
-    open(f"{problem_dir}/{problem_name}.cpp", "w").close()
+    shutil.copy(TEMPLATE_DIR, f"{problem_dir}/{problem_name}.cpp")
     config["cpp"]["path"] = f"{problem_path}/{problem_name}.cpp"
 
 
