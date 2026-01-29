@@ -309,10 +309,11 @@ int main() {
 
     string problemCpp = config["cpp"]["path"];
     string test_case = config["cpp"]["test_case"];
+    int test_case_num = config["cpp"]["test_case_num"];
 
     string problemExe = "problem.exe";
     if (!compileSolution(problemCpp, problemExe)) return 1;
 
     int timeoutMs = 1000;
-    testCases(test_case, 1, 20, problemExe, timeoutMs);
+    testCases(test_case, 1, test_case_num, problemExe, timeoutMs);
 }

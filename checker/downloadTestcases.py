@@ -82,6 +82,7 @@ time.sleep(2)
 print("waiting for testcase page...")
 download_buttons = driver.find_elements(By.CSS_SELECTOR, "a.btn.btn-info.btn-sm")
 print(f"Found {len(download_buttons)} download buttons.")
+config["cpp"]["test_case_num"] = len(download_buttons)
 
 for index, btn in enumerate(download_buttons, start=1):
     href = btn.get_attribute("href")
