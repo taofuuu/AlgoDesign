@@ -1,8 +1,4 @@
 Q1
-a66_f1_make_zero
-a66_q2a_insertion_count
-a65_q2a_huge_array
-da66_m1_line_paint
 a58_q1_triple
 ex01m3
 ex01m2
