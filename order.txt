@@ -1,5 +1,4 @@
 Q1
-ex01m2
 a60b_mid_p4_merge
 ex01e3
 ex02e3_bs
