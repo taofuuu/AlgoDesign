@@ -2,44 +2,48 @@
 #include <vector>
 #include <queue>
 #include <algorithm>
+#include <numeric>
 
 using namespace std;
 
+vector<int> arr;
+int k;
+
+void solve(int l, int r) {
+    // stop if k swap have been done (1 for root)
+    // or on leaf node
+    if (k <= 1 || l >= r - 1) {
+        return;
+    }
+
+    // split mergesort on Left and Right
+    k -= 2;
+
+    int mid = (l + r) / 2;
+
+    // swap first (reversal)
+    swap(arr[mid - 1], arr[mid]);
+    
+    solve(l, mid);
+    solve(mid, r);
+}
+
 int main() {
-    int n, k;
+    int n;
     cin >> n >> k;
 
-    if (k % 2 == 0 || k > 2 * n - 1) { // must be odd (2 new branches + root) and < 2n - 1
+    // must be odd (root + binaray tree)
+    // cannot exceed binary tree nodes (2n - 1)
+    if (k % 2 == 0 || k > 2 * n - 1) {
         cout << -1 << endl;
         return 0;
     }
 
-    vector<int> arr; arr.reserve(n);
-    for (size_t i = 1; i <= n; i++) {
-        arr.push_back(i);
-    }
+    arr.resize(n);
+    // generate [1..n]
+    iota(arr.begin(), arr.end(), 1);
 
-    // root call
-    k--;
-
-    queue<pair<int,int>> q;
-    q.push({0, n - 1});
-
-    while (k > 0) {
-        auto [left, right] = q.front();
-        q.pop();
-
-        if (left < right) {
-            int mid = (left + right) / 2;
-
-            swap(arr[mid - 1], arr[mid]); // swap only adj. (guaranteed unsort)
-            k -= 2; // 2 branches called
-
-            // call on each sub array
-            q.push({left, mid - 1});
-            q.push({mid, right});
-        }
-    }
+    solve(0, n);
 
     for (size_t i = 0; i < n; ++i) {
         cout << arr[i] << " ";

@@ -1,7 +1,4 @@
 Q1
-a60b_mid_p4_merge
-ex01e3
-ex02e3_bs
 a62_q1b_virus
 a60_q1_matmod
 ex01e4
