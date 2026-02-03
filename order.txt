@@ -1,4 +1,5 @@
 Q1
+ex01m2
 a60b_mid_p4_merge
 ex01e3
 ex02e3_bs
@@ -21,14 +22,8 @@ ex01m1
 a60a_midp2_avl_distance
 a66_q1a_double_end_sequence
 a64_q1_lawn_mowing
-ex01h1
-a57_m4_gaa
 a60_q1_number1
 a59_midp3_similar
-a59_q1_ones
-a60_q1_number1
-a60_q1_number1
-a60b_q2_pareto
-a60a_midp2_avl_distance
+a59_q1_ones	
 ex02h1_closest
 a65_q1b_street_art
