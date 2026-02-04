@@ -26,12 +26,20 @@ int main() {
     vector<long long> base(4);
     for (size_t i = 0; i < 4; ++i) cin >> base[i]; 
 
+    // n = 13 = b'1101
+    // starting from LSB (right)
+    // 1 -> res * base (1 * A)      | square A -> A^2   | res = A
+    // 0 -> don't take              | square A -> A^4   | res = A
+    // 1 -> res * base (A * A^4)    | square A -> A^8   | res = A^5
+    // 1 -> res * base (A^5 * A^8)  | square A -> A^16  | res = A^13
+
+
     while (n > 0) {
-        if (n % 2 == 1) {
-            // multiply 1 times -> make even
+        if (n % 2 == 1) { // LSB == 1
+            // multiply to res
             res = matrixMultMod(res, base, k);
         }
-        // square the multiplier
+        // square the multiplier (switching to a higher significant bit)
         base = matrixMultMod(base, base, k);
         n /= 2;
     }
