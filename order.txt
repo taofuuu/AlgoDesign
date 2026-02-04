@@ -1,5 +1,4 @@
 Q1
-a62_q1b_virus
 a60_q1_matmod
 ex01e4
 a63_q1b_virus2
