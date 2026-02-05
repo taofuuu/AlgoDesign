@@ -1,9 +1,4 @@
 Q1
-a60_q1_matmod
-ex01e4
-a63_q1b_virus2
-a66_q1b_triforce
-a61_q1_thanos
 a57_m5_mcs2
 ex01e2
 a60b_q2_pareto
