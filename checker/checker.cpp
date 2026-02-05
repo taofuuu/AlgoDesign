@@ -13,6 +13,7 @@
 #include <psapi.h>
 #include <fstream>
 #include "json.hpp"
+#include <windows.h>
 
 using namespace std;
 using json = nlohmann::json;
@@ -229,6 +230,8 @@ void readyToDelete(string name) {
 
 void testCases(string name, int caseStart, int caseEnd, const string &exePath, int timeoutMs) {
     
+    int problemLength = caseEnd - caseStart + 1;
+    vector<string> scoreText;
     int scores = 0;
     int notFound = 0;
     for (int i = caseStart; i <= caseEnd; i++) {
@@ -254,13 +257,19 @@ void testCases(string name, int caseStart, int caseEnd, const string &exePath, i
         
         vector<string> expected = readOutput(outFile);
         vector<string> answer = readOutput(tmpFile);
-        if (answerCheck(expected, answer)) scores++;
+        if (answerCheck(expected, answer)) {
+            scoreText.push_back("🟢");
+            ++scores;
+        }
+        else scoreText.push_back("🔴");
         
         chrono::duration<double> duration = end - start;
         cout << "Execution time: " << duration.count() << " s\n\n";
     }
-    cout << "Testcase Passed: " << scores << "/" << caseEnd - caseStart + 1 - notFound << endl;
-    if (scores == caseEnd - caseStart + 1 - notFound) readyToDelete(name);
+    cout << "Testcase Passed: ";
+    for (auto score : scoreText) cout << score << " ";
+    cout << "[" << scores << "/" << problemLength - notFound << "]" << endl;
+    if (scores == problemLength - notFound) readyToDelete(name);
 }
 
 bool compileSolution(const string &problemCpp, const string &exeName) {
@@ -303,6 +312,8 @@ bool compileSolution(const string &problemCpp, const string &exeName) {
 }
 
 int main() {
+    SetConsoleOutputCP(CP_UTF8);
+
     ifstream file("config.json");
     json config;
     file >> config;
