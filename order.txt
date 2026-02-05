@@ -1,7 +1,4 @@
 Q1
-a57_m5_mcs2
-ex01e2
-a60b_q2_pareto
 a62_q1a_recur
 a58_m3_hadamard
 a65_q1_mt_matrix
