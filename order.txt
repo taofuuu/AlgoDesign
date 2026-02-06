@@ -1,6 +1,4 @@
 Q1
-a62_q1a_recur
-a58_m3_hadamard
 a65_q1_mt_matrix
 a59_midp4_mcsw
 a57_m4_gaa
