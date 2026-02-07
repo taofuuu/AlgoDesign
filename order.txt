@@ -1,9 +1,4 @@
 Q1
-a65_q1_mt_matrix
-a59_midp4_mcsw
-a57_m4_gaa
-ex01h1
-ex01m1
 a60a_midp2_avl_distance
 a66_q1a_double_end_sequence
 a64_q1_lawn_mowing
