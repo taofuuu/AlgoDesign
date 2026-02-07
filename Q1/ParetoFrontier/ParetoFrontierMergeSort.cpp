@@ -45,8 +45,8 @@ vector<int> pareto(int l, int r) {
     // - keep ALL of them (they are safe)
     // - 'maxRightY' to set what left side must beat
     // - pushing first => sorted by X descending
-    // - although only first from RIGHT pass ∀b {a.x > b.x},
-    //   other also pass from ∀b {a.y > b.y}
+    // - although only first entry from RIGHT pass ∀b {a.x > b.x},
+    //   but other also pass from ∀b {a.y > b.y} (from prev conquer node)
     int maxRightY = INT_MIN;
     for (int i : rPareto) {
         maxRightY = max(maxRightY, points[i].y);
