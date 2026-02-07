@@ -7,7 +7,6 @@ using namespace std;
 typedef long long ll;
 
 vector<int> base;
-vector<int> prefixSum;
 ll p, k, a, b;
 
 int getCount(int l, int r) {
