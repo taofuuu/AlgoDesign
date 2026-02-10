@@ -1,6 +1,4 @@
 Q1
-a60a_midp2_avl_distance
-a66_q1a_double_end_sequence
 a64_q1_lawn_mowing
 a60_q1_number1
 a59_midp3_similar
