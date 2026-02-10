@@ -1,5 +1,4 @@
 Q1
-a64_q1_lawn_mowing
 a60_q1_number1
 a59_midp3_similar
 a59_q1_ones	
