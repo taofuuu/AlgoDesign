@@ -2,5 +2,4 @@ Q1
 a60_q1_number1
 a59_midp3_similar
 a59_q1_ones	
-ex02h1_closest
 a65_q1b_street_art
