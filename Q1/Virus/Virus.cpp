@@ -21,7 +21,7 @@ bool checkVirus(int l, int r, bool mutated) {
     bool left_ok, right_ok;
     if (!mutated) { // currently not mutated
         left_ok = checkVirus(l, mid, true) || checkVirus(l, mid, false); // check possible mutation
-        right_ok = checkVirus(mid + 1, r, false); // all left-subtree should not be mutated!
+        right_ok = checkVirus(mid + 1, r, false); // all right-subtree should not be mutated!
     } else { // currently mutated (reversed order left <=> right)
         left_ok = checkVirus(l, mid, true);
         right_ok = checkVirus(mid + 1, r, true) || checkVirus(mid + 1, r, false); // == left -> check possible mutation
