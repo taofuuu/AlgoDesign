@@ -27,7 +27,7 @@ int main() {
         currentSum += seq[i];
         prefixSum[i] = currentSum;
 
-        // number seen, calc subarray sum
+        // number seen, record min prev sum
         if (minPrevPrefix.count(seq[i])) {
             minPrevPrefix[seq[i]] = min(minPrevPrefix[seq[i]], prevSum);
         } else {
