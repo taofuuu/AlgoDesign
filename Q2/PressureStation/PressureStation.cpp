@@ -14,7 +14,7 @@ int main() {
         cin >> p[i];
     }
 
-    vector<int> dp(n + 1, INT_MAX); // minimum cost to regulate all segment 1...i;
+    vector<int> dp(n + 1, INT_MAX); // dp[i] = minimum cost to regulate all segment 1...i;
 
     int minCost = INT_MAX;
     for (int i = 1; i <= n; ++i) {
