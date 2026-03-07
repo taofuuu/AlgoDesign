@@ -5,7 +5,6 @@ a59_q1_ones
 a65_q1b_street_art
 
 Q2
-ex03m2_lis***
 a59_q1_quicksum
 a60b_q1_diagsum
 a62_q1a_jumping
@@ -25,4 +24,12 @@ a57_m3_tile
 a63_q1a_buffet
 da66_f2_new_game_plus***
 a65_q2b_arch_match
+
+Grader2
+a68_q1b_guitar_array_2
+a68_q2a_dividing
+a68_q2a_goat
+
+Q3
+ex03m2_lis
 a59_midp1_lcs
