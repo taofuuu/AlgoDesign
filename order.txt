@@ -5,12 +5,7 @@ a59_q1_ones
 a65_q1b_street_art
 
 Q2
-a59_q1_quicksum
-a60b_q1_diagsum
-a62_q1a_jumping
-a60b_mid_p2_rope
-a65_q2a_distance_one
-da67_f_one_two_apart***
+da67_f_one_two_apart
 a63_q1a_101
 a64_q2_table_no_11
 a60a_midp4_walk
