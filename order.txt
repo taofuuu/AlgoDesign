@@ -31,5 +31,22 @@ a68_q2a_dividing
 a68_q2a_goat
 
 Q3
-ex03m2_lis
-a59_midp1_lcs
+ex04e1_interval
+ex04e2_fknapsack
+ex04e3_teamwork 
+a60b_mid_p1_buffet
+a58_m4_supply
+a57_f3_drainage 
+a65_q4_tower_defense_2
+ex04h1_montblanc
+ex04m2_salesman
+ex04m1_sort 
+a65_q0_degrees
+a60a_q3_component 
+ex05m1_cycle
+a59_q3_cycle 
+a62_q2a_line_graph
+a64_q3_wildfire
+a66_f1_largest_diff_path
+da66_f2_grid_loop
+a66_q3b_hex_map_v2
