@@ -26,8 +26,6 @@ a68_q2a_dividing
 a68_q2a_goat
 
 Q3
-ex04e1_interval
-ex04e2_fknapsack
 ex04e3_teamwork 
 a60b_mid_p1_buffet
 a58_m4_supply
