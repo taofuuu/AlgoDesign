@@ -23,12 +23,6 @@ a68_q2a_dividing
 a68_q2a_goat
 
 Q3
-a66_f1_largest_diff_path
-da66_f2_grid_loop
-a66_q3b_hex_map_v2
-ex05e1_shortest
-ex05m2_connection
-ex05e2_planning
 ex06e1_cable
 da67_f_border_extend
 a66_q3a_sandworm
