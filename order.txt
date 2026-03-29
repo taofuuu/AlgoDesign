@@ -6,19 +6,16 @@ a65_q1b_street_art
 
 Q2
 da67_f_one_two_apart
+a65_q2b_arch_match
 a63_q1a_101
 a64_q2_table_no_11
 a60a_midp4_walk
 a64_q2_two_mcs
 a60a_midp3_bigger
 a63_q1b_2side
-a60b_mid_p3_divide***
-a62_q1b_chocolate***
 a60a_midp1_knapsack
 a57_m3_tile
 a63_q1a_buffet
-da66_f2_new_game_plus***
-a65_q2b_arch_match
 
 Grader2
 a68_q1b_guitar_array_2
