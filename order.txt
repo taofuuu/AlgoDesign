@@ -23,9 +23,6 @@ a68_q2a_dividing
 a68_q2a_goat
 
 Q3
-ex06e1_cable
-da67_f_border_extend
-a66_q3a_sandworm
 ex05h1_rank
 ex05e3_catapult
 ex06e2_shortest
