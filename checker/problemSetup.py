@@ -68,7 +68,13 @@ def main():
     time.sleep(2)
     driver.find_element(By.ID, "login").send_keys(NAME)
     driver.find_element(By.ID, "password").send_keys(PASSWORD)
-    driver.find_element(By.ID, "accept-agree").click()
+
+    try:
+        driver.find_element(By.ID, "accept-agree").click()
+        
+    except:
+        pass
+
     driver.find_element(By.NAME, "commit").click()
     print("logged in!")
     time.sleep(3)
