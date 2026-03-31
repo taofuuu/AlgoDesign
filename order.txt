@@ -23,25 +23,20 @@ a68_q2a_dividing
 a68_q2a_goat
 
 Q3
-ex05h1_rank
-ex05e3_catapult
-ex06e2_shortest
-ex06e3_columbia
-ex06m1_massrelay
-ex06m2_exchange
-a66_f1_ev_truck
+a61_q2_farthest
 
 a62_q2a_pandemic
 a60b_q3_perimeter
 a65_q3a_in_the_middle
 a60b_q3_ikea
+
 a59_q3_hole
 a60a_q3_xor_road
-a58_q3_p3_PandG
-a64_q3_shortest_start
-a61_q2_farthest
-a58_q3_p3a_hacking
 a65_q3a_expressway
+
+ex05h1_rank
+ex05e3_catapult
+a58_q3_p3_PandG
 
 Q4
 ex04e3_teamwork
