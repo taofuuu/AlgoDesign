@@ -17,11 +17,6 @@ a60a_midp1_knapsack
 a57_m3_tile
 a63_q1a_buffet
 
-Grader2
-a68_q1b_guitar_array_2
-a68_q2a_dividing
-a68_q2a_goat
-
 Q3
 a61_q2_farthest
 
