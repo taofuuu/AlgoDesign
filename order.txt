@@ -19,16 +19,13 @@ a63_q1a_buffet
 
 Q3
 a61_q2_farthest
-
 a62_q2a_pandemic
 a60b_q3_perimeter
 a65_q3a_in_the_middle
 a60b_q3_ikea
-
 a59_q3_hole
 a60a_q3_xor_road
 a65_q3a_expressway
-
 ex05h1_rank
 ex05e3_catapult
 a58_q3_p3_PandG
