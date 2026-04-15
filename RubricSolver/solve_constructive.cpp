@@ -107,62 +107,88 @@ string routeEmptySpace(const BoardState& state, int targetRow, int targetCol) {
     return path;
 }
 
-// 2. OPTIMIZED TILE PATHFINDER (Prevents crashing into locked tiles)
+// 2. OPTIMIZED TILE PATHFINDER (Cost-Aware Dijkstra to prefer staircasing)
 string getTilePath(const BoardState& state, int startR, int startC, int destR, int destC) {
     int N = state.N;
     if (startR == destR && startC == destC) return "";
 
-    queue<pair<int, int>> q;
-    vector<vector<bool>> visited(N, vector<bool>(N, false));
-    vector<vector<pair<int, int>>> parent(N, vector<pair<int, int>>(N, {-1, -1}));
-    vector<vector<char>> moveMade(N, vector<char>(N, ' '));
+    // Tuple: {total_cost, r, c, incoming_direction}
+    // incoming_direction: 0=U, 1=D, 2=L, 3=R, 4=Start
+    priority_queue<tuple<int, int, int, int>, vector<tuple<int, int, int, int>>, greater<tuple<int, int, int, int>>> pq;
+    
+    // dist[r][c][dir]
+    vector<vector<vector<int>>> dist(N, vector<vector<int>>(N, vector<int>(5, 999999)));
+    
+    struct ParentNode { int r, c, dir; char cmd; };
+    vector<vector<vector<ParentNode>>> parent(N, vector<vector<ParentNode>>(N, vector<ParentNode>(5)));
 
-    q.push({startR, startC});
-    visited[startR][startC] = true;
+    pq.push({0, startR, startC, 4});
+    dist[startR][startC][4] = 0;
 
     int dr[] = {-1, 1, 0, 0};
     int dc[] = {0, 0, -1, 1};
     char cmd[] = {'U', 'D', 'L', 'R'};
-    bool found = false;
 
-    while (!q.empty()) {
-        int r = q.front().first;
-        int c = q.front().second;
-        q.pop();
+    int bestFinalCost = 999999;
+    int finalDir = -1;
+
+    while (!pq.empty()) {
+        auto [cost, r, c, inDir] = pq.top();
+        pq.pop();
+
+        if (cost > dist[r][c][inDir]) continue;
 
         if (r == destR && c == destC) {
-            found = true;
-            break;
+            if (cost < bestFinalCost) {
+                bestFinalCost = cost;
+                finalDir = inDir;
+            }
+            continue;
         }
 
         for (int i = 0; i < 4; ++i) {
             int nr = r + dr[i];
             int nc = c + dc[i];
 
-            if (nr >= 0 && nr < N && nc >= 0 && nc < N) {
-                if (!visited[nr][nc] && !state.locked[nr][nc]) {
-                    visited[nr][nc] = true;
-                    parent[nr][nc] = {r, c};
-                    moveMade[nr][nc] = cmd[i];
-                    q.push({nr, nc});
+            if (nr >= 0 && nr < N && nc >= 0 && nc < N && !state.locked[nr][nc]) {
+                int stepCost = 0;
+                
+                if (inDir == 4) {
+                    stepCost = 1; // First move
+                } else if (inDir == i) {
+                    stepCost = 5; // Straight line penalty! Empty space must wrap around.
+                } else if ((inDir == 0 && i == 1) || (inDir == 1 && i == 0) || 
+                           (inDir == 2 && i == 3) || (inDir == 3 && i == 2)) {
+                    stepCost = 10; // Complete reversal penalty.
+                } else {
+                    stepCost = 3; // 90-degree turn (Staircasing). Highly efficient.
+                }
+
+                int nextCost = cost + stepCost;
+
+                if (nextCost < dist[nr][nc][i]) {
+                    dist[nr][nc][i] = nextCost;
+                    parent[nr][nc][i] = {r, c, inDir, cmd[i]};
+                    pq.push({nextCost, nr, nc, i});
                 }
             }
         }
     }
 
-    if (!found) return "";
+    if (finalDir == -1) return "";
 
     string path = "";
-    int currR = destR;
-    int currC = destC;
+    int currR = destR, currC = destC, currDir = finalDir;
+
+    // Trace back the optimal path
     while (currR != startR || currC != startC) {
-        path += moveMade[currR][currC];
-        int nextR = parent[currR][currC].first;
-        int nextC = parent[currR][currC].second;
-        currR = nextR;
-        currC = nextC;
+        ParentNode p = parent[currR][currC][currDir];
+        path += p.cmd;
+        currR = p.r;
+        currC = p.c;
+        currDir = p.dir;
     }
-    
+
     reverse(path.begin(), path.end());
     return path;
 }
