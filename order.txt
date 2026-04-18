@@ -31,10 +31,6 @@ ex05e3_catapult
 a58_q3_p3_PandG
 
 Q4
-ex07e2_iss
-ex07e1_nqueen
-ex07m1_knapsack
-a57_f4_journey
 ex07m2_15puzzle
 da67_f_travelling_tourist
 
