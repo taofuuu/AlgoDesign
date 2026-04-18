@@ -107,7 +107,7 @@ def main():
             problem_name = strong.parent.execute_script(
                 "return arguments[0].childNodes[0].textContent.trim();",
                 strong
-            ).strip().replace(" ", "")
+            ).strip().replace(" ", "").replace("/","-")
             
             # extract problem statement
             pdf_link = td.find_element(
