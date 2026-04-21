@@ -31,7 +31,7 @@ ex05e3_catapult
 a58_q3_p3_PandG
 
 Q4
-da67_f_travelling_tourist
+a66_q4a_clique
 
 ex04h1_montblanc
 ex04m2_salesman
