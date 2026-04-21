@@ -98,7 +98,9 @@ int main() {
             }
         }
     }
-
+    
+    // Iterative Deepening A* (IDA*): dfs with threshold
+    // Each iteration of DFS, limit threshold by the least move possible of last iteration
     threshold = getHeuristic();
     while (true) {
         int result = solve(0, 0, 0);
