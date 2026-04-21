@@ -31,16 +31,13 @@ ex05e3_catapult
 a58_q3_p3_PandG
 
 Q4
-a66_q4a_clique
-
-ex04h1_montblanc
-ex04m2_salesman
 ex04m1_sort
+ex04m2_salesman
+ex04h1_montblanc
 
-a64_q4_closest_subset
 ex07e3_coloring
+a64_q4_closest_subset
 a64_q4_path_sum
 a65_q4_collector
-a66_q4a_clique
 da66_f1_buffet_flight
 da66_f1_sea_bridge
