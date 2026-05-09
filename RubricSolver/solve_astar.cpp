@@ -8,8 +8,6 @@
 
 using namespace std;
 
-// Good for small table (1)
-
 // snapshot of the puzzle board
 struct BoardState {
     int N;
@@ -101,7 +99,7 @@ vector<BoardState> getValidMoves(const BoardState& current) {
     return nextStates;
 }
 
-// Calculates the Manhattan distance heuristic
+// calculates Manhattan distance heuristic
 int calculateHeuristic(const BoardState& state, const vector<vector<int>>& targetPattern) {
     int h = 0;
     int N = state.N;
@@ -112,7 +110,7 @@ int calculateHeuristic(const BoardState& state, const vector<vector<int>>& targe
         for (int tc = 0; tc < targetSize; ++tc) {
             int targetVal = targetPattern[tr][tc];
             
-            // We don't care where the empty space ends up in the target
+            // skip empty space
             if (targetVal == -1) continue; 
 
             int minDist = INT_MAX;
@@ -121,7 +119,7 @@ int calculateHeuristic(const BoardState& state, const vector<vector<int>>& targe
             for (int r = 0; r < N; ++r) {
                 for (int c = 0; c < N; ++c) {
                     if (state.grid[r][c] == targetVal) {
-                        // The target zone starts at grid[1][1], so we offset tr and tc by +1
+                        // offset tr and tc by +1
                         int dist = abs(r - (tr + 1)) + abs(c - (tc + 1));
                         if (dist < minDist) {
                             minDist = dist;
@@ -129,7 +127,7 @@ int calculateHeuristic(const BoardState& state, const vector<vector<int>>& targe
                     }
                 }
             }
-            h += minDist; // Add the best distance to our total heuristic score
+            h += minDist; // add to total heuristic score
         }
     }
     return h;
@@ -165,13 +163,13 @@ string solvePuzzle(const BoardState& startState, const vector<vector<int>>& targ
                  << " | Queue size: " << pq.size() << endl;
         }
 
-        // Check if we've won
+        // check if we've won
         if (isTargetAchieved(current, targetPattern)) {
             cerr << "\nTarget found at depth " << current.g_cost << "!" << endl;
             return current.commandHistory + "S"; 
         }
 
-        // Generate next moves
+        // generate next moves
         vector<BoardState> nextMoves = getValidMoves(current);
         
         for (BoardState& nextState : nextMoves) {
@@ -232,7 +230,7 @@ int main() {
     } else {
         cout << "Target Achieved!" << endl;
         cout << "Command Sequence: " << solution << endl;
-        cout << "Total Moves: " << solution.length() - 1 << " (excluding Submit)" << endl;
+        cout << "Total Moves: " << solution.length() - 1 << endl;
     }
 
     return 0;

@@ -8,20 +8,17 @@
 
 using namespace std;
 
-// Medium Table ()
 
-// Updated struct for constructive solving
 struct BoardState {
     int N;
     vector<vector<int>> grid;
     int emptyRow, emptyCol; 
     string commandHistory; 
     
-    // NEW: Tracks tiles we have solved so the router avoids them
     vector<vector<bool>> locked; 
 };
 
-// Function to physically execute a command string on our single board
+// physically execute a command string on each state
 void executeCommands(BoardState& state, const string& commands) {
     for (char cmd : commands) {
         int r = state.emptyRow;
@@ -44,7 +41,8 @@ void executeCommands(BoardState& state, const string& commands) {
     }
 }
 
-// 1. OPTIMIZED EMPTY SPACE ROUTER
+
+// navigate empty space to target pos while avoiding locked grid
 string routeEmptySpace(const BoardState& state, int targetRow, int targetCol) {
     int N = state.N;
     if (state.emptyRow == targetRow && state.emptyCol == targetCol) return "";
@@ -91,7 +89,7 @@ string routeEmptySpace(const BoardState& state, int targetRow, int targetCol) {
 
     if (!found) return "";
 
-    // Trace backwards to build the final string
+    // trace backwards to build the final string
     string path = "";
     int currR = targetRow;
     int currC = targetCol;
@@ -107,7 +105,7 @@ string routeEmptySpace(const BoardState& state, int targetRow, int targetCol) {
     return path;
 }
 
-// 2. OPTIMIZED TILE PATHFINDER (Cost-Aware Dijkstra to prefer staircasing)
+// generate optimal tile pathing to destination (dijkstra w/ cost)
 string getTilePath(const BoardState& state, int startR, int startC, int destR, int destC) {
     int N = state.N;
     if (startR == destR && startC == destC) return "";
@@ -119,7 +117,12 @@ string getTilePath(const BoardState& state, int startR, int startC, int destR, i
     // dist[r][c][dir]
     vector<vector<vector<int>>> dist(N, vector<vector<int>>(N, vector<int>(5, 999999)));
     
-    struct ParentNode { int r, c, dir; char cmd; };
+    struct ParentNode { 
+        int r, c, dir; 
+        char cmd; 
+    };
+
+    // parent[nr][nc][dir]
     vector<vector<vector<ParentNode>>> parent(N, vector<vector<ParentNode>>(N, vector<ParentNode>(5)));
 
     pq.push({0, startR, startC, 4});
@@ -154,14 +157,14 @@ string getTilePath(const BoardState& state, int startR, int startC, int destR, i
                 int stepCost = 0;
                 
                 if (inDir == 4) {
-                    stepCost = 1; // First move
+                    stepCost = 1; // first move
                 } else if (inDir == i) {
-                    stepCost = 5; // Straight line penalty! Empty space must wrap around.
+                    stepCost = 5; // empty space must wrap around
                 } else if ((inDir == 0 && i == 1) || (inDir == 1 && i == 0) || 
                            (inDir == 2 && i == 3) || (inDir == 3 && i == 2)) {
-                    stepCost = 10; // Complete reversal penalty.
+                    stepCost = 10; // reversal penalty
                 } else {
-                    stepCost = 3; // 90-degree turn (Staircasing). Highly efficient.
+                    stepCost = 3; // 90-degree turn (Staircasing). preferable
                 }
 
                 int nextCost = cost + stepCost;
@@ -180,7 +183,7 @@ string getTilePath(const BoardState& state, int startR, int startC, int destR, i
     string path = "";
     int currR = destR, currC = destC, currDir = finalDir;
 
-    // Trace back the optimal path
+    // trace back the optimal path
     while (currR != startR || currC != startC) {
         ParentNode p = parent[currR][currC][currDir];
         path += p.cmd;
@@ -193,9 +196,9 @@ string getTilePath(const BoardState& state, int startR, int startC, int destR, i
     return path;
 }
 
-// 3. UPDATED TILE PUSHER
+// relocates empty by routeEmptySpace so that the tile can move accordingly to the getTilePath
 void moveTile(BoardState& state, int startR, int startC, int destR, int destC) {
-    // Get the safe path that avoids locked tiles
+    // get safe path that avoids locked tiles
     string tilePath = getTilePath(state, startR, startC, destR, destC);
     
     int currR = startR;
@@ -227,43 +230,40 @@ void moveTile(BoardState& state, int startR, int startC, int destR, int destC) {
 }
 
 bool isAlreadyInPlace(int r, int c, int val, int N, const vector<vector<int>>& targetPattern) {
-    // If the tile is inside the target zone
+    // check if in zone
     if (r >= 1 && r < N - 1 && c >= 1 && c < N - 1) {
-        // Return true if it already perfectly matches the target requirement
         return targetPattern[r - 1][c - 1] == val;
     }
     return false;
 }
 
-
-// The Constructive Master Solver
+// constructive solver
 string solvePuzzle(BoardState& state, const vector<vector<int>>& targetPattern) {
     int N = state.N;
     int targetSize = N - 2;
 
-    // 1. Initialize the locked grid to all false
+    // initialize the locked grid to all false
     state.locked.assign(N, vector<bool>(N, false));
 
-    // 2. Iterate through every space in the target pattern
+    // iterate through every tile in target pattern
     for (int tr = 0; tr < targetSize; ++tr) {
         for (int tc = 0; tc < targetSize; ++tc) {
             int targetVal = targetPattern[tr][tc];
 
-            // If we don't care about this spot (e.g., it's a -1), skip it
+            // skip empty space
             if (targetVal == -1) continue;
 
-            // Offset by 1 because the target area starts at grid[1][1]
+            // offset for target space
             int destR = tr + 1; 
             int destC = tc + 1;
 
-            // If the correct tile happens to already be there, just lock it!
-            if (state.grid[destR][destC] == targetVal) {
+            // lock tiles if located at target pattern
+            if (isAlreadyInPlace(destR, destC, state.grid[destR][destC], N, targetPattern)) {
                 state.locked[destR][destC] = true;
                 continue; 
             }
 
-            // 3. Scan the board for the BEST UNLOCKED tile
-            // First, run BFS from destination to find TRUE path distances (avoiding locked walls)
+            // scan the board for 'best' unlocked tile (avoiding locked walls)
             vector<vector<int>> trueDist(N, vector<int>(N, 999999));
             queue<pair<int, int>> dq;
             
@@ -282,7 +282,7 @@ string solvePuzzle(BoardState& state, const vector<vector<int>>& targetPattern) 
                     int nr = r + dr[i];
                     int nc = c + dc[i];
                     if (nr >= 0 && nr < N && nc >= 0 && nc < N) {
-                        // Spread distance only through unlocked spaces
+                        // flood only unlocked spaces
                         if (!state.locked[nr][nc] && trueDist[nr][nc] == 999999) {
                             trueDist[nr][nc] = trueDist[r][c] + 1;
                             dq.push({nr, nc});
@@ -291,18 +291,18 @@ string solvePuzzle(BoardState& state, const vector<vector<int>>& targetPattern) 
                 }
             }
 
+            // find best source (start) to move to destination
             int startR = -1, startC = -1;
             int bestScore = 9999999;
-            bool found = false;
             
             for (int r = 0; r < N; ++r) {
                 for (int c = 0; c < N; ++c) {
                     if (state.grid[r][c] == targetVal && !state.locked[r][c] && trueDist[r][c] != 999999) {
                         
-                        // Base score is the TRUE step distance
+                        // base score
                         int score = trueDist[r][c]; 
                         
-                        // MASSIVE PENALTY: Don't steal a tile that is already perfectly placed for the future!
+                        // don't take tile that already in place, but not yet to lock
                         if (isAlreadyInPlace(r, c, targetVal, N, targetPattern)) {
                             score += 10000;
                         }
@@ -311,23 +311,18 @@ string solvePuzzle(BoardState& state, const vector<vector<int>>& targetPattern) 
                             bestScore = score;
                             startR = r;
                             startC = c;
-                            found = true;
                         }
                     }
                 }
             }
 
-            // 4. Move the tile to its destination, then lock it down
-            if (found) {
-                moveTile(state, startR, startC, destR, destC);
-                state.locked[destR][destC] = true;
-            } else {
-                return "Error: The board is missing a required tile!";
-            }
+            // move the tile to its destination, then lock it
+            moveTile(state, startR, startC, destR, destC);
+            state.locked[destR][destC] = true;
         }
     }
 
-    // Once the loops finish, all target tiles are locked in place. We win!
+    // all target tiles are locked in place.
     return state.commandHistory + "S";
 }
 
@@ -341,7 +336,7 @@ string optimizeCommands(string cmds) {
         for (char curr : cmds) {
             if (!nextCmds.empty()) {
                 char last = nextCmds.back();
-                // If the current move exactly undoes the last move, delete both!
+                // if the current move exactly undoes the last move, delete both
                 if ((last == 'U' && curr == 'D') || (last == 'D' && curr == 'U') ||
                     (last == 'L' && curr == 'R') || (last == 'R' && curr == 'L')) {
                     nextCmds.pop_back(); // Remove the previous move
@@ -357,32 +352,23 @@ string optimizeCommands(string cmds) {
 }
 
 int main() {
-    // Loop through testcases 1 to 6
-    for (int t = 1; t <= 6; ++t) {
+    // loop through testcases 1 to 6
+    for (int t = 2; t <= 6; ++t) {
+        // ===== EXTRACTION =====
         string inFileName = "testdata/" + to_string(t) + ".in";
         string outFileName = "solution_" + to_string(t) + ".txt";
 
         ifstream inFile(inFileName);
-        
-        // Check if the input file actually exists
-        if (!inFile.is_open()) {
-            cout << "Skipping Testcase " << t << ": '" << inFileName << "' not found." << endl;
-            continue; 
-        }
 
         cout << "Processing " << inFileName << "..." << endl;
 
         BoardState startState;
         
-        // 1. Read N (grid size) from the file
-        if (!(inFile >> startState.N)) {
-            cerr << "Error: No valid data in " << inFileName << endl;
-            inFile.close();
-            continue; 
-        }
+        // read grid size
+        inFile >> startState.N;
         int N = startState.N;
         
-        // 2. Read the starting grid from the file
+        // read the starting grid
         startState.grid.resize(N, vector<int>(N));
         for (int r = 0; r < N; ++r) {
             for (int c = 0; c < N; ++c) {
@@ -394,32 +380,31 @@ int main() {
                 }
             }
         }
-        startState.commandHistory = "";
-        // Initialize the locked grid to entirely false
-        startState.locked.assign(N, vector<bool>(N, false));
 
-        // 3. Read the target pattern from the file
+        // read the target pattern
         int targetSize = N - 2;
         vector<vector<int>> targetPattern(targetSize, vector<int>(targetSize));
-        
         for (int r = 0; r < targetSize; ++r) {
             for (int c = 0; c < targetSize; ++c) {
                 inFile >> targetPattern[r][c];
             }
         }
         
-        inFile.close(); // Done reading this file
+        inFile.close();
 
-        // 4. Run the solver
+
+        // ===== SOLVER =====
+        // run the solver
         string solution = solvePuzzle(startState, targetPattern);
         
-        // 5. Optimize and Output the result directly to the text file
+        // catch error
         if (solution.rfind("Error", 0) == 0) { 
             cerr << "Failed on Testcase " << t << ": " << solution << endl;
         } else {
-            // Strip the 'S', run the peephole optimizer, and add 'S' back
+            // run post-processed optimization
             string optimizedSolution = optimizeCommands(solution.substr(0, solution.length() - 1)) + "S";
 
+            // saves to log file
             ofstream outFile(outFileName);
             
             if (outFile.is_open()) {
@@ -427,14 +412,13 @@ int main() {
                 outFile.close();     
                 
                 cout << "  -> Success! Written to '" << outFileName << "'." << endl;
-                cout << "  -> Total Commands: " << optimizedSolution.length() - 1 << " (excluding Submit)" << endl;
+                cout << "  -> Total Commands: " << optimizedSolution.length() - 1 << endl;
             } else {
                 cerr << "  -> Error: Unable to create '" << outFileName << "' for writing." << endl;
             }
         }
-        cout << string(40, '-') << endl; // Visual separator
+        cout << string(40, '-') << endl;
     }
 
-    cout << "Batch processing complete!" << endl;
     return 0;
 }
